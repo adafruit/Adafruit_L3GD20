@@ -85,14 +85,15 @@ bool Adafruit_L3GD20::init(l3gd20Range_t rng, byte addr)
                                   11 = 2000 dps
      0  SIM       SPI Mode (0=4-wire, 1=3-wire)                       0 */
 
+  /* Adjust resolution if requested */
   switch(range)
   {
-	case L3DS20_RANGE_500DPS:
+    case L3DS20_RANGE_500DPS:
       write8(L3GD20_REGISTER_CTRL_REG4, 0x10);
-	  break;
-	case L3DS20_RANGE_2000DPS:
+      break;
+    case L3DS20_RANGE_2000DPS:
       write8(L3GD20_REGISTER_CTRL_REG4, 0x20);
-	  break;
+      break;
   }
   /* ------------------------------------------------------------------ */
 

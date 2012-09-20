@@ -59,13 +59,13 @@ class Adafruit_L3GD20
       L3GD20_REGISTER_TSH_ZL              = 0x37,   // 00000000   rw
       L3GD20_REGISTER_INT1_DURATION       = 0x38    // 00000000   rw
     } l3gd20Registers_t;
-	
-	typedef enum
-	{
-	  L3DS20_RANGE_250DPS,
-	  L3DS20_RANGE_500DPS,
-	  L3DS20_RANGE_2000DPS
-	} l3gd20Range_t;
+
+    typedef enum
+    {
+      L3DS20_RANGE_250DPS,
+      L3DS20_RANGE_500DPS,
+      L3DS20_RANGE_2000DPS
+    } l3gd20Range_t;
 
     typedef struct l3gd20Data_s
     {
@@ -83,7 +83,7 @@ class Adafruit_L3GD20
     void write8(l3gd20Registers_t reg, byte value);
     byte read8(l3gd20Registers_t reg);
     byte address;
-	l3gd20Range_t range;
+        l3gd20Range_t range;
 };
 
 #endif
