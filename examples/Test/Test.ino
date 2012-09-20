@@ -9,9 +9,11 @@ void setup()
   
   // Make sure I2C is properly setup
   Wire.begin();
-  
+
   // Try to initialise and warn if we couldn't detect the chip
-  if (!gyro.init())
+  // if (!gyro.init(gyro.L3DS20_RANGE_250DPS))
+  // if (!gyro.init(gyro.L3DS20_RANGE_500DPS))
+  if (!gyro.init(gyro.L3DS20_RANGE_2000DPS))
   {
     Serial.println("Oops ... unable to initialize the L3GD20. Check your wiring!");
     while (1);

@@ -19,15 +19,16 @@
 /***************************************************************************
  CONSTRUCTOR
  ***************************************************************************/
-bool Adafruit_L3GD20::init(byte addr)
+bool Adafruit_L3GD20::init(l3gd20Range_t rng, byte addr)
 {
   address = addr;
+  range = rng;
 
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
   if (read8(L3GD20_REGISTER_WHO_AM_I) != L3GD20_ID)
   {
-          return false;
+    return false;
   }
 
   /* Set CTRL_REG1 (0x20)
@@ -84,7 +85,15 @@ bool Adafruit_L3GD20::init(byte addr)
                                   11 = 2000 dps
      0  SIM       SPI Mode (0=4-wire, 1=3-wire)                       0 */
 
-  /* Nothing to do ... keep default values */
+  switch(range)
+  {
+	case L3DS20_RANGE_500DPS:
+      write8(L3GD20_REGISTER_CTRL_REG4, 0x10);
+	  break;
+	case L3DS20_RANGE_2000DPS:
+      write8(L3GD20_REGISTER_CTRL_REG4, 0x30);
+	  break;
+  }
   /* ------------------------------------------------------------------ */
 
   /* Set CTRL_REG5 (0x24)
@@ -114,7 +123,7 @@ void Adafruit_L3GD20::read()
   // Make sure to set address auto-increment bit
   Wire.write(L3GD20_REGISTER_OUT_X_L | 0x80);
   Wire.endTransmission();
-  Wire.requestFrom(address, 6);
+  Wire.requestFrom(address, (byte)6);
 
   // Wait around until enough data is available
   while (Wire.available() < 6);
@@ -144,7 +153,7 @@ void Adafruit_L3GD20::read()
 /***************************************************************************
  PRIVATE FUNCTIONS
  ***************************************************************************/
-void Adafruit_L3GD20::write8(byte reg, byte value)
+void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
 {
   Wire.beginTransmission(address);
   Wire.write(reg);
@@ -152,14 +161,14 @@ void Adafruit_L3GD20::write8(byte reg, byte value)
   Wire.endTransmission();
 }
 
-byte Adafruit_L3GD20::read8(byte reg)
+byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
 {
   byte value;
 
   Wire.beginTransmission(address);
   Wire.write(reg);
   Wire.endTransmission();
-  Wire.requestFrom(address, 1);
+  Wire.requestFrom(address, (byte)1);
   value = Wire.read();
   Wire.endTransmission();
 
