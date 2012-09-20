@@ -91,7 +91,7 @@ bool Adafruit_L3GD20::init(l3gd20Range_t rng, byte addr)
       write8(L3GD20_REGISTER_CTRL_REG4, 0x10);
 	  break;
 	case L3DS20_RANGE_2000DPS:
-      write8(L3GD20_REGISTER_CTRL_REG4, 0x30);
+      write8(L3GD20_REGISTER_CTRL_REG4, 0x20);
 	  break;
   }
   /* ------------------------------------------------------------------ */
@@ -117,8 +117,6 @@ bool Adafruit_L3GD20::init(l3gd20Range_t rng, byte addr)
  ***************************************************************************/
 void Adafruit_L3GD20::read()
 {
-  int16_t x, y, z;
-
   Wire.beginTransmission(address);
   // Make sure to set address auto-increment bit
   Wire.write(L3GD20_REGISTER_OUT_X_L | 0x80);
@@ -136,18 +134,9 @@ void Adafruit_L3GD20::read()
   uint8_t zhi = Wire.read();
 
   // Shift values to create properly formed integer (low byte first)
-  x = (xlo | (xhi << 8));
-  y = (ylo | (yhi << 8));
-  z = (zlo | (zhi << 8));
-
-  //  Sign extend negative numbers
-  if (xhi & 0x80) x += 0xFFFF;
-  if (yhi & 0x80) y += 0xFFFF;
-  if (zhi & 0x80) z += 0xFFFF;
-
-  data.x = x;
-  data.y = y;
-  data.z = z;
+  data.x = (xlo | (xhi << 8));
+  data.y = (ylo | (yhi << 8));
+  data.z = (zlo | (zhi << 8));
 }
 
 /***************************************************************************
@@ -156,7 +145,7 @@ void Adafruit_L3GD20::read()
 void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
 {
   Wire.beginTransmission(address);
-  Wire.write(reg);
+  Wire.write((byte)reg);
   Wire.write(value);
   Wire.endTransmission();
 }
@@ -166,7 +155,7 @@ byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
   byte value;
 
   Wire.beginTransmission(address);
-  Wire.write(reg);
+  Wire.write((byte)reg);
   Wire.endTransmission();
   Wire.requestFrom(address, (byte)1);
   value = Wire.read();

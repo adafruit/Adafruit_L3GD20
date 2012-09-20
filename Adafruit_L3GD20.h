@@ -69,9 +69,9 @@ class Adafruit_L3GD20
 
     typedef struct l3gd20Data_s
     {
-      int16_t x;
-      int16_t y;
-      int16_t z;
+      float x;
+      float y;
+      float z;
     } l3gd20Data;
 
     bool init(l3gd20Range_t rng=L3DS20_RANGE_250DPS, byte addr=L3GD20_ADDRESS);
