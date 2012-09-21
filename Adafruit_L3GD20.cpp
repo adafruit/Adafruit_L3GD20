@@ -1,16 +1,17 @@
 /***************************************************
   This is a library for the L3GD20 GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout
+  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  ----> https://www.adafruit.com/products/1032
 
-  These displays use I2C to communicate, 2 pins are required to
-  interface
+  These sensors use I2C or SPI to communicate, 2 pins (I2C) 
+  or 4 pins (SPI) are required to interface.
 
   Adafruit invests time and resources providing this open source code,
   please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Kevin Townsend for Adafruit Industries.
+  Written by Kevin "KTOWN" Townsend for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
@@ -19,8 +20,31 @@
 /***************************************************************************
  CONSTRUCTOR
  ***************************************************************************/
+
+Adafruit_L3GD20::Adafruit_L3GD20(int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
+  _cs = cs;
+  _miso = miso;
+  _mosi = mosi;
+  _clk = clk;
+}
+
+Adafruit_L3GD20::Adafruit_L3GD20(void) {
+  // use i2c
+  _cs = _mosi = _miso = _clk = -1;
+}
+
 bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 {
+  if (_cs == -1) {
+    Wire.begin();
+  } else {
+    pinMode(_cs, OUTPUT);
+    pinMode(_clk, OUTPUT);
+    pinMode(_mosi, OUTPUT);
+    pinMode(_miso, INPUT);
+    digitalWrite(_cs, HIGH);
+  }
+
   address = addr;
   range = rng;
 
@@ -117,23 +141,41 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
  PUBLIC FUNCTIONS
  ***************************************************************************/
 void Adafruit_L3GD20::read()
-{
-  Wire.beginTransmission(address);
-  // Make sure to set address auto-increment bit
-  Wire.write(L3GD20_REGISTER_OUT_X_L | 0x80);
-  Wire.endTransmission();
-  Wire.requestFrom(address, (byte)6);
+{ 
+  uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
 
-  // Wait around until enough data is available
-  while (Wire.available() < 6);
+  if (_cs == -1) {
+    Wire.beginTransmission(address);
+    // Make sure to set address auto-increment bit
+    Wire.write(L3GD20_REGISTER_OUT_X_L | 0x80);
+    Wire.endTransmission();
+    Wire.requestFrom(address, (byte)6);
+    
+    // Wait around until enough data is available
+    while (Wire.available() < 6);
+    
+    xlo = Wire.read();
+    xhi = Wire.read();
+    ylo = Wire.read();
+    yhi = Wire.read();
+    zlo = Wire.read();
+    zhi = Wire.read();
 
-  uint8_t xlo = Wire.read();
-  uint8_t xhi = Wire.read();
-  uint8_t ylo = Wire.read();
-  uint8_t yhi = Wire.read();
-  uint8_t zlo = Wire.read();
-  uint8_t zhi = Wire.read();
+  } else {
+    digitalWrite(_clk, HIGH);
+    digitalWrite(_cs, LOW);
 
+    SPIxfer(L3GD20_REGISTER_OUT_X_L | 0x80 | 0x40); // SPI read, autoincrement
+    delay(10);
+    xlo = SPIxfer(0xFF);
+    xhi = SPIxfer(0xFF);
+    ylo = SPIxfer(0xFF);
+    yhi = SPIxfer(0xFF);
+    zlo = SPIxfer(0xFF);
+    zhi = SPIxfer(0xFF);
+
+    digitalWrite(_cs, HIGH);
+  }
   // Shift values to create properly formed integer (low byte first)
   data.x = (xlo | (xhi << 8));
   data.y = (ylo | (yhi << 8));
@@ -145,22 +187,62 @@ void Adafruit_L3GD20::read()
  ***************************************************************************/
 void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
 {
-  Wire.beginTransmission(address);
-  Wire.write((byte)reg);
-  Wire.write(value);
-  Wire.endTransmission();
+  if (_cs == -1) {
+    // use i2c
+    Wire.beginTransmission(address);
+    Wire.write((byte)reg);
+    Wire.write(value);
+    Wire.endTransmission();
+  } else {
+    digitalWrite(_clk, HIGH);
+    digitalWrite(_cs, LOW);
+
+    SPIxfer(reg);
+    SPIxfer(value);
+
+    digitalWrite(_cs, HIGH);
+  }
 }
 
 byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
 {
   byte value;
 
-  Wire.beginTransmission(address);
-  Wire.write((byte)reg);
-  Wire.endTransmission();
-  Wire.requestFrom(address, (byte)1);
-  value = Wire.read();
-  Wire.endTransmission();
+  if (_cs == -1) {
+    // use i2c
+    Wire.beginTransmission(address);
+    Wire.write((byte)reg);
+    Wire.endTransmission();
+    Wire.requestFrom(address, (byte)1);
+    value = Wire.read();
+    Wire.endTransmission();
+  } else {
+    digitalWrite(_clk, HIGH);
+    digitalWrite(_cs, LOW);
+
+    SPIxfer((uint8_t)reg | 0x80); // set READ bit
+    value = SPIxfer(0xFF);
+
+    digitalWrite(_cs, HIGH);
+  }
+
+  return value;
+}
+
+uint8_t Adafruit_L3GD20::SPIxfer(uint8_t x) {
+  uint8_t value = 0;
+
+  for (int i=7; i>=0; i--) {
+    digitalWrite(_clk, LOW);
+    if (x & (1<<i)) {
+      digitalWrite(_mosi, HIGH);
+    } else {
+      digitalWrite(_mosi, LOW);
+      }
+    digitalWrite(_clk, HIGH);
+    if (digitalRead(_miso))
+      value |= (1<<i);
+  }
 
   return value;
 }

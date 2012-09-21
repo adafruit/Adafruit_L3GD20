@@ -1,16 +1,17 @@
 /***************************************************
   This is a library for the L3GD20 GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout
+  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  ----> https://www.adafruit.com/products/1032
 
-  These displays use I2C to communicate, 2 pins are required to
-  interface
+  These sensors use I2C or SPI to communicate, 2 pins (I2C) 
+  or 4 pins (SPI) are required to interface.
 
   Adafruit invests time and resources providing this open source code,
   please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Kevin Townsend for Adafruit Industries.
+  Written by Kevin "KTOWN" Townsend for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 #ifndef __L3GD20_H__
@@ -74,6 +75,9 @@ class Adafruit_L3GD20
       float z;
     } l3gd20Data;
 
+    Adafruit_L3GD20(int8_t cs, int8_t mosi, int8_t miso, int8_t clk);
+    Adafruit_L3GD20(void);
+
     bool begin(l3gd20Range_t rng=L3DS20_RANGE_250DPS, byte addr=L3GD20_ADDRESS);
     void read(void);
 
@@ -82,8 +86,10 @@ class Adafruit_L3GD20
   private:
     void write8(l3gd20Registers_t reg, byte value);
     byte read8(l3gd20Registers_t reg);
+    uint8_t SPIxfer(uint8_t x);
     byte address;
-        l3gd20Range_t range;
+    l3gd20Range_t range;
+    int8_t _miso, _mosi, _clk, _cs;
 };
 
 #endif
