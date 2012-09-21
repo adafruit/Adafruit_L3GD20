@@ -12,10 +12,6 @@ products from Adafruit!
 
 Check out the links above for our tutorials and wiring diagrams 
 
-Adafruit invests time and resources providing this open source code, 
-please support Adafruit and open-source hardware by purchasing 
-products from Adafruit!
-
 Written by Kevin Townsend for Adafruit Industries.  
 BSD license, all text above must be included in any redistribution
 
