@@ -74,7 +74,7 @@ class Adafruit_L3GD20
       float z;
     } l3gd20Data;
 
-    bool init(l3gd20Range_t rng=L3DS20_RANGE_250DPS, byte addr=L3GD20_ADDRESS);
+    bool begin(l3gd20Range_t rng=L3DS20_RANGE_250DPS, byte addr=L3GD20_ADDRESS);
     void read(void);
 
     l3gd20Data data;    // Last read will be available here

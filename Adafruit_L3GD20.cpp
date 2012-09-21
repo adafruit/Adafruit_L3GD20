@@ -19,7 +19,7 @@
 /***************************************************************************
  CONSTRUCTOR
  ***************************************************************************/
-bool Adafruit_L3GD20::init(l3gd20Range_t rng, byte addr)
+bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 {
   address = addr;
   range = rng;
