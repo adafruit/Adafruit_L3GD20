@@ -27,6 +27,8 @@
 #define L3GD20_ADDRESS                (0x6B)        // 1101001
 #define L3GD20_POLL_TIMEOUT           (100)         // Maximum number of read attempts
 #define L3GD20_ID                     (0b11010100)
+#define L3G4200D_ADDRESS              (0x69)        // 0b01101001
+#define L3G4200D_ID                   (0b11010011)
 
 #define L3GD20_SENSITIVITY_250DPS  (0.00875F)      // Roughly 22/256 for fixed point match
 #define L3GD20_SENSITIVITY_500DPS  (0.0175F)       // Roughly 45/256
@@ -72,6 +74,8 @@ class Adafruit_L3GD20
       L3DS20_RANGE_500DPS,
       L3DS20_RANGE_2000DPS
     } l3gd20Range_t;
+
+    static const byte L3DS20_ADDRESS_L3G4200D = L3G4200D_ADDRESS;
 
     typedef struct l3gd20Data_s
     {
