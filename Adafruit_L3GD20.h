@@ -24,7 +24,7 @@
 #endif
 #include "Wire.h"
 
-#define L3GD20_ADDRESS                (0x6B)        // 1101001
+#define L3GD20_ADDRESS                (0x6B)        // 1101011
 #define L3GD20_POLL_TIMEOUT           (100)         // Maximum number of read attempts
 #define L3GD20_ID                     (0b11010100)
 
