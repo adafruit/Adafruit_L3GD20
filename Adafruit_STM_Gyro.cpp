@@ -15,25 +15,25 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include <Adafruit_L3GD20.h>
+#include "Adafruit_STM_Gyro.h"
 
 /***************************************************************************
  CONSTRUCTOR
  ***************************************************************************/
 
-Adafruit_L3GD20::Adafruit_L3GD20(int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
+Adafruit_STM_Gyro::Adafruit_STM_Gyro(int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
   _cs = cs;
   _miso = miso;
   _mosi = mosi;
   _clk = clk;
 }
 
-Adafruit_L3GD20::Adafruit_L3GD20(void) {
+Adafruit_STM_Gyro::Adafruit_STM_Gyro(void) {
   // use i2c
   _cs = _mosi = _miso = _clk = -1;
 }
 
-bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
+bool Adafruit_STM_Gyro::begin(gyroRange_t rng, byte addr)
 {
   if (_cs == -1) {
     Wire.begin();
@@ -51,7 +51,7 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
    
-  byte whoami = read8(L3GD20_REGISTER_WHO_AM_I); 
+  byte whoami = read8(GYRO_REGISTER_WHO_AM_I); 
   if (whoami != L3GD20_ID && whoami != L3G4200D_ID)
   {
     return false;
@@ -69,7 +69,7 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
      0  XEN       X-axis enable (0 = disabled, 1 = enabled)           1 */
 
   /* Switch to normal mode and enable all three channels */
-  write8(L3GD20_REGISTER_CTRL_REG1, 0x0F);
+  write8(GYRO_REGISTER_CTRL_REG1, 0x0F);
   /* ------------------------------------------------------------------ */
 
   /* Set CTRL_REG2 (0x21)
@@ -114,14 +114,14 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
   /* Adjust resolution if requested */
   switch(range)
   {
-    case L3DS20_RANGE_250DPS:
-      write8(L3GD20_REGISTER_CTRL_REG4, 0x00);
+    case GYRO_RANGE_250DPS:
+      write8(GYRO_REGISTER_CTRL_REG4, 0x00);
       break;
-    case L3DS20_RANGE_500DPS:
-      write8(L3GD20_REGISTER_CTRL_REG4, 0x10);
+    case GYRO_RANGE_500DPS:
+      write8(GYRO_REGISTER_CTRL_REG4, 0x10);
       break;
-    case L3DS20_RANGE_2000DPS:
-      write8(L3GD20_REGISTER_CTRL_REG4, 0x20);
+    case GYRO_RANGE_2000DPS:
+      write8(GYRO_REGISTER_CTRL_REG4, 0x20);
       break;
   }
   /* ------------------------------------------------------------------ */
@@ -145,14 +145,14 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 /***************************************************************************
  PUBLIC FUNCTIONS
  ***************************************************************************/
-void Adafruit_L3GD20::read()
+void Adafruit_STM_Gyro::read()
 { 
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
 
   if (_cs == -1) {
     Wire.beginTransmission(address);
     // Make sure to set address auto-increment bit
-    Wire.write(L3GD20_REGISTER_OUT_X_L | 0x80);
+    Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
     Wire.endTransmission();
     Wire.requestFrom(address, (byte)6);
     
@@ -170,7 +170,7 @@ void Adafruit_L3GD20::read()
     digitalWrite(_clk, HIGH);
     digitalWrite(_cs, LOW);
 
-    SPIxfer(L3GD20_REGISTER_OUT_X_L | 0x80 | 0x40); // SPI read, autoincrement
+    SPIxfer(GYRO_REGISTER_OUT_X_L | 0x80 | 0x40); // SPI read, autoincrement
     delay(10);
     xlo = SPIxfer(0xFF);
     xhi = SPIxfer(0xFF);
@@ -189,20 +189,20 @@ void Adafruit_L3GD20::read()
   // Compensate values depending on the resolution
   switch(range)
   {
-    case L3DS20_RANGE_250DPS:
-      data.x *= L3GD20_SENSITIVITY_250DPS;
-      data.y *= L3GD20_SENSITIVITY_250DPS;
-      data.z *= L3GD20_SENSITIVITY_250DPS;
+    case GYRO_RANGE_250DPS:
+      data.x *= GYRO_SENSITIVITY_250DPS;
+      data.y *= GYRO_SENSITIVITY_250DPS;
+      data.z *= GYRO_SENSITIVITY_250DPS;
       break;
-    case L3DS20_RANGE_500DPS:
-      data.x *= L3GD20_SENSITIVITY_500DPS;
-      data.y *= L3GD20_SENSITIVITY_500DPS;
-      data.z *= L3GD20_SENSITIVITY_500DPS;
+    case GYRO_RANGE_500DPS:
+      data.x *= GYRO_SENSITIVITY_500DPS;
+      data.y *= GYRO_SENSITIVITY_500DPS;
+      data.z *= GYRO_SENSITIVITY_500DPS;
       break;
-    case L3DS20_RANGE_2000DPS:
-      data.x *= L3GD20_SENSITIVITY_2000DPS;
-      data.y *= L3GD20_SENSITIVITY_2000DPS;
-      data.z *= L3GD20_SENSITIVITY_2000DPS;
+    case GYRO_RANGE_2000DPS:
+      data.x *= GYRO_SENSITIVITY_2000DPS;
+      data.y *= GYRO_SENSITIVITY_2000DPS;
+      data.z *= GYRO_SENSITIVITY_2000DPS;
       break;
   }
 }
@@ -210,7 +210,7 @@ void Adafruit_L3GD20::read()
 /***************************************************************************
  PRIVATE FUNCTIONS
  ***************************************************************************/
-void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
+void Adafruit_STM_Gyro::write8(gyroRegisters_t reg, byte value)
 {
   if (_cs == -1) {
     // use i2c
@@ -229,7 +229,7 @@ void Adafruit_L3GD20::write8(l3gd20Registers_t reg, byte value)
   }
 }
 
-byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
+byte Adafruit_STM_Gyro::read8(gyroRegisters_t reg)
 {
   byte value;
 
@@ -254,7 +254,7 @@ byte Adafruit_L3GD20::read8(l3gd20Registers_t reg)
   return value;
 }
 
-uint8_t Adafruit_L3GD20::SPIxfer(uint8_t x) {
+uint8_t Adafruit_STM_Gyro::SPIxfer(uint8_t x) {
   uint8_t value = 0;
 
   for (int i=7; i>=0; i--) {
