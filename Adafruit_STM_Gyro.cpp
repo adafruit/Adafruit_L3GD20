@@ -16,6 +16,7 @@
  ****************************************************/
 
 #include "Adafruit_STM_Gyro.h"
+#include <Adafruit_Sensor.h>
 
 /***************************************************************************
  CONSTRUCTOR
@@ -145,13 +146,13 @@ bool Adafruit_STM_Gyro::begin(gyroRange_t rng, byte addr)
 /***************************************************************************
  PUBLIC FUNCTIONS
  ***************************************************************************/
-void Adafruit_STM_Gyro::getEvent(sensors_event_t event*)
+void Adafruit_STM_Gyro::getEvent(sensors_event_t* event)
 {
   /* Clear and prepare the event */
   memset(event, 0, sizeof(sensors_event_t)); 
   event->version   = sizeof(sensors_event_t);
   event->sensor_id = 0; // _sensorID;
-  event->type      = SENSOR_TYPE_GYRSCOPE;
+  event->type      = SENSOR_TYPE_GYROSCOPE;
   event->timestamp = millis();
 
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
