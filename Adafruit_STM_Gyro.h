@@ -23,6 +23,7 @@
  #include "WProgram.h"
 #endif
 #include "Wire.h"
+#include <Adafruit_Sensor.h>
 
 #define L3GD20_ADDRESS                (0x6B)        // 1101011
 #define L3GD20_POLL_TIMEOUT           (100)         // Maximum number of read attempts
@@ -75,22 +76,13 @@ class Adafruit_STM_Gyro
       GYRO_RANGE_2000DPS
     } gyroRange_t;
 
-    static const byte GYRO_ADDRESS_L3G4200D = L3G4200D_ADDRESS;
-
-    typedef struct gyroData_s
-    {
-      float x;
-      float y;
-      float z;
-    } gyroData;
-
     Adafruit_STM_Gyro(int8_t cs, int8_t mosi, int8_t miso, int8_t clk);
     Adafruit_STM_Gyro(void);
 
     bool begin(gyroRange_t rng=GYRO_RANGE_250DPS, byte addr=L3GD20_ADDRESS);
-    void read(void);
-
-    gyroData data;    // Last read will be available here
+    
+    void  getEvent(sensors_event_t*);
+    void  getSensor(sensor_t*);
 
   private:
     void write8(gyroRegisters_t reg, byte value);

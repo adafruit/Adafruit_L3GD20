@@ -145,8 +145,15 @@ bool Adafruit_STM_Gyro::begin(gyroRange_t rng, byte addr)
 /***************************************************************************
  PUBLIC FUNCTIONS
  ***************************************************************************/
-void Adafruit_STM_Gyro::read()
-{ 
+void Adafruit_STM_Gyro::getEvent(sensors_event_t event*)
+{
+  /* Clear and prepare the event */
+  memset(event, 0, sizeof(sensors_event_t)); 
+  event->version   = sizeof(sensors_event_t);
+  event->sensor_id = 0; // _sensorID;
+  event->type      = SENSOR_TYPE_GYRSCOPE;
+  event->timestamp = millis();
+
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
 
   if (_cs == -1) {
@@ -182,27 +189,27 @@ void Adafruit_STM_Gyro::read()
     digitalWrite(_cs, HIGH);
   }
   // Shift values to create properly formed integer (low byte first)
-  data.x = (xlo | (xhi << 8));
-  data.y = (ylo | (yhi << 8));
-  data.z = (zlo | (zhi << 8));
+  event->gyro.x = (xlo | (xhi << 8));
+  event->gyro.y = (ylo | (yhi << 8));
+  event->gyro.z = (zlo | (zhi << 8));
   
   // Compensate values depending on the resolution
   switch(range)
   {
     case GYRO_RANGE_250DPS:
-      data.x *= GYRO_SENSITIVITY_250DPS;
-      data.y *= GYRO_SENSITIVITY_250DPS;
-      data.z *= GYRO_SENSITIVITY_250DPS;
+      event->gyro.x *= GYRO_SENSITIVITY_250DPS;
+      event->gyro.y *= GYRO_SENSITIVITY_250DPS;
+      event->gyro.z *= GYRO_SENSITIVITY_250DPS;
       break;
     case GYRO_RANGE_500DPS:
-      data.x *= GYRO_SENSITIVITY_500DPS;
-      data.y *= GYRO_SENSITIVITY_500DPS;
-      data.z *= GYRO_SENSITIVITY_500DPS;
+      event->gyro.x *= GYRO_SENSITIVITY_500DPS;
+      event->gyro.y *= GYRO_SENSITIVITY_500DPS;
+      event->gyro.z *= GYRO_SENSITIVITY_500DPS;
       break;
     case GYRO_RANGE_2000DPS:
-      data.x *= GYRO_SENSITIVITY_2000DPS;
-      data.y *= GYRO_SENSITIVITY_2000DPS;
-      data.z *= GYRO_SENSITIVITY_2000DPS;
+      event->gyro.x *= GYRO_SENSITIVITY_2000DPS;
+      event->gyro.y *= GYRO_SENSITIVITY_2000DPS;
+      event->gyro.z *= GYRO_SENSITIVITY_2000DPS;
       break;
   }
 }
