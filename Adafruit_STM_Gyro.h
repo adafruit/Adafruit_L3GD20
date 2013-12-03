@@ -36,6 +36,32 @@
 #define GYRO_SENSITIVITY_2000DPS (0.070F)        // Roughly 18/256
 #define GYRO_DPS_TO_RADS         (0.017453293F)  // degress/s to rad/s multiplier
 
+typedef struct
+{
+  String modelName;
+  byte I2CAddress;
+  byte deviceID;
+  float resolution;
+  int32_t minDelay;
+} gyro_type;
+
+/* resolution and minDelay need to be pulled from dataSheets */
+const gyro_type L3GD20_type = {
+  "L3GD20", //modelName
+  0x6B, //I2CAddress
+  0b11010100, //deviceID
+  0, //resolution   
+  0, //minDelay
+};
+
+const gyro_type L3G4200D_type = {
+  "L3G4200D", //modelName
+  0x69, //I2CAddress
+  0b11010011, //deviceID
+  0, //resolution
+  0, //minDelay
+};      
+
 class Adafruit_STM_Gyro
 {
   public:
@@ -71,24 +97,25 @@ class Adafruit_STM_Gyro
 
     typedef enum
     {
-      GYRO_RANGE_250DPS,
-      GYRO_RANGE_500DPS,
-      GYRO_RANGE_2000DPS
+      GYRO_RANGE_250DPS = 250,
+      GYRO_RANGE_500DPS = 500,
+      GYRO_RANGE_2000DPS = 2000
     } gyroRange_t;
 
-    Adafruit_STM_Gyro(int8_t cs, int8_t mosi, int8_t miso, int8_t clk);
-    Adafruit_STM_Gyro(void);
+    Adafruit_STM_Gyro(gyro_type my_type, int8_t cs, int8_t mosi, int8_t miso, int8_t clk);
+    Adafruit_STM_Gyro(gyro_type my_type);
 
-    bool begin(gyroRange_t rng=GYRO_RANGE_250DPS, byte addr=L3GD20_ADDRESS);
+    bool begin(gyroRange_t rng=GYRO_RANGE_250DPS);
     
     void  getEvent(sensors_event_t*);
     void  getSensor(sensor_t*);
+    
+    gyro_type type;
 
   private:
     void write8(gyroRegisters_t reg, byte value);
     byte read8(gyroRegisters_t reg);
     uint8_t SPIxfer(uint8_t x);
-    byte address;
     gyroRange_t range;
     int8_t _miso, _mosi, _clk, _cs;
 };

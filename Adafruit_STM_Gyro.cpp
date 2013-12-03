@@ -22,19 +22,21 @@
  CONSTRUCTOR
  ***************************************************************************/
 
-Adafruit_STM_Gyro::Adafruit_STM_Gyro(int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
+Adafruit_STM_Gyro::Adafruit_STM_Gyro(gyro_type my_type, int8_t cs, int8_t miso, int8_t mosi, int8_t clk) {
+  this->type = my_type;
   _cs = cs;
   _miso = miso;
   _mosi = mosi;
   _clk = clk;
 }
 
-Adafruit_STM_Gyro::Adafruit_STM_Gyro(void) {
+Adafruit_STM_Gyro::Adafruit_STM_Gyro(gyro_type my_type) {
   // use i2c
+  this->type = my_type;
   _cs = _mosi = _miso = _clk = -1;
 }
 
-bool Adafruit_STM_Gyro::begin(gyroRange_t rng, byte addr)
+bool Adafruit_STM_Gyro::begin(gyroRange_t rng)
 {
   if (_cs == -1) {
     Wire.begin();
@@ -46,14 +48,13 @@ bool Adafruit_STM_Gyro::begin(gyroRange_t rng, byte addr)
     digitalWrite(_cs, HIGH);
   }
 
-  address = addr;
   range = rng;
 
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
    
   byte whoami = read8(GYRO_REGISTER_WHO_AM_I); 
-  if (whoami != L3GD20_ID && whoami != L3G4200D_ID)
+  if (whoami != this->type.deviceID)
   {
     return false;
   }
@@ -158,11 +159,11 @@ void Adafruit_STM_Gyro::getEvent(sensors_event_t* event)
   uint8_t xhi, xlo, ylo, yhi, zlo, zhi;
 
   if (_cs == -1) {
-    Wire.beginTransmission(address);
+    Wire.beginTransmission(this->type.I2CAddress);
     // Make sure to set address auto-increment bit
     Wire.write(GYRO_REGISTER_OUT_X_L | 0x80);
     Wire.endTransmission();
-    Wire.requestFrom(address, (byte)6);
+    Wire.requestFrom(this->type.I2CAddress, (byte)6);
     
     // Wait around until enough data is available
     while (Wire.available() < 6);
@@ -214,6 +215,24 @@ void Adafruit_STM_Gyro::getEvent(sensors_event_t* event)
       break;
   }
 }
+    
+void  Adafruit_STM_Gyro::getSensor(sensor_t* sensor)
+{
+  
+  /* Clear the sensor_t object */
+  memset(sensor, 0, sizeof(sensor_t));
+
+  /* Insert the sensor name in the fixed length char array */
+  strncpy (sensor->name, "SensorName", sizeof(sensor->name) - 1);
+  sensor->name[sizeof(sensor->name)- 1] = 0;
+  sensor->version     = 1;
+  sensor->sensor_id   = this->type.deviceID;
+  sensor->type        = SENSOR_TYPE_GYROSCOPE;
+  sensor->min_delay   = this->type.minDelay;
+  sensor->max_value   = (float)this->range;              
+  sensor->min_value   = this->range * -1.0;
+  sensor->resolution  = this->type.resolution;             
+}
 
 /***************************************************************************
  PRIVATE FUNCTIONS
@@ -222,7 +241,7 @@ void Adafruit_STM_Gyro::write8(gyroRegisters_t reg, byte value)
 {
   if (_cs == -1) {
     // use i2c
-    Wire.beginTransmission(address);
+    Wire.beginTransmission(this->type.I2CAddress);
     Wire.write((byte)reg);
     Wire.write(value);
     Wire.endTransmission();
@@ -243,10 +262,10 @@ byte Adafruit_STM_Gyro::read8(gyroRegisters_t reg)
 
   if (_cs == -1) {
     // use i2c
-    Wire.beginTransmission(address);
+    Wire.beginTransmission(this->type.I2CAddress);
     Wire.write((byte)reg);
     Wire.endTransmission();
-    Wire.requestFrom(address, (byte)1);
+    Wire.requestFrom(this->type.I2CAddress, (byte)1);
     value = Wire.read();
     Wire.endTransmission();
   } else {
