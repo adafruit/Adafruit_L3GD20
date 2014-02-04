@@ -18,3 +18,10 @@ BSD license, all text above must be included in any redistribution
 To download. click the DOWNLOADS button in the top right corner, rename the uncompressed folder Adafruit_L3GD20. Check that the Adafruit_L3GD20 folder contains Adafruit_L3GD20.cpp and Adafruit_L3GD20.h
 
 Place the Adafruit_L3GD20 library folder your (arduinosketchfolder)/libraries/ folder. You may need to create the libraries subfolder if its your first library. Restart the IDE.
+
+--------------------------------------------------------------------------------
+2013-05-10 Mark Ruys added support for L3G4200D. The L3G4200D is register
+compatible with a L3GD20. To use a L3G4200D, initialize the gyroscoop with address L3DS20_ADDRESS_L3G4200D (L3DS20_ prefix to comply to library naming):
+
+    gyro.begin(gyro.L3DS20_RANGE_250DPS, gyro.L3DS20_ADDRESS_L3G4200D)
+

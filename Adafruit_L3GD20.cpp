@@ -50,7 +50,9 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
-  if (read8(L3GD20_REGISTER_WHO_AM_I) != L3GD20_ID)
+   
+  byte whoami = read8(L3GD20_REGISTER_WHO_AM_I); 
+  if (whoami != L3GD20_ID && whoami != L3G4200D_ID)
   {
     return false;
   }
