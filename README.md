@@ -1,6 +1,6 @@
 This is a library for the Adafruit Triple-Axis Gyro sensor
 
-Designed specifically to work with the Adafruit L3GD20 Breakout 
+Designed specifically to work with the Adafruit L3GD20/L3GD20H Breakout 
   ----> https://www.adafruit.com/products/1032
 
 These sensors use I2C or SPI to communicate, 2 pins (I2C) or 4 pins (SPI) 

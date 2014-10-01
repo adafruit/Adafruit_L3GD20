@@ -1,7 +1,7 @@
 /***************************************************
-  This is a library for the L3GD20 GYROSCOPE
+  This is a library for the L3GD20 and L3GD20H GYROSCOPE
 
-  Designed specifically to work with the Adafruit L3GD20 Breakout 
+  Designed specifically to work with the Adafruit L3GD20(H) Breakout 
   ----> https://www.adafruit.com/products/1032
 
   These sensors use I2C or SPI to communicate, 2 pins (I2C) 
@@ -50,7 +50,9 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
 
   /* Make sure we have the correct chip ID since this checks
      for correct address and that the IC is properly connected */
-  if (read8(L3GD20_REGISTER_WHO_AM_I) != L3GD20_ID)
+  uint8_t id = read8(L3GD20_REGISTER_WHO_AM_I);
+  //Serial.println(id, HEX);
+  if ((id != L3GD20_ID) && (id != L3GD20H_ID))
   {
     return false;
   }

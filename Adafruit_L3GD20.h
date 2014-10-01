@@ -26,7 +26,8 @@
 
 #define L3GD20_ADDRESS                (0x6B)        // 1101001
 #define L3GD20_POLL_TIMEOUT           (100)         // Maximum number of read attempts
-#define L3GD20_ID                     (0b11010100)
+#define L3GD20_ID                     0xD4
+#define L3GD20H_ID                    0xD7
 
 class Adafruit_L3GD20
 {
