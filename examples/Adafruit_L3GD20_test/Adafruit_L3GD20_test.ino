@@ -18,14 +18,20 @@
 #include <Wire.h> 
 #include <Adafruit_L3GD20.h>
 
-// By default, uses I2C
-//Adafruit_L3GD20 gyro;
-// Alternately, you can use SPI, but you have to define the pins
-#define GYRO_CS 4 // labeled CS
-#define GYRO_DO 5 // labeled SA0
-#define GYRO_DI 6  // labeled SDA
-#define GYRO_CLK 7 // labeled SCL
-Adafruit_L3GD20 gyro(GYRO_CS, GYRO_DO, GYRO_DI, GYRO_CLK);
+// Comment this next line to use SPI
+//#define USE_I2C
+
+#ifdef USE_I2C
+  // The default constructor uses I2C
+  Adafruit_L3GD20 gyro;
+#else
+  // To use SPI, you have to define the pins
+  #define GYRO_CS 4 // labeled CS
+  #define GYRO_DO 5 // labeled SA0
+  #define GYRO_DI 6  // labeled SDA
+  #define GYRO_CLK 7 // labeled SCL
+  Adafruit_L3GD20 gyro(GYRO_CS, GYRO_DO, GYRO_DI, GYRO_CLK);
+#endif
 
 void setup() 
 {
