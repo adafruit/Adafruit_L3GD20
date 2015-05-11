@@ -182,9 +182,9 @@ void Adafruit_L3GD20::read()
     digitalWrite(_cs, HIGH);
   }
   // Shift values to create properly formed integer (low byte first)
-  data.x = (xlo | (xhi << 8));
-  data.y = (ylo | (yhi << 8));
-  data.z = (zlo | (zhi << 8));
+  data.x = (int16_t)(xlo | (xhi << 8));
+  data.y = (int16_t)(ylo | (yhi << 8));
+  data.z = (int16_t)(zlo | (zhi << 8));
   
   // Compensate values depending on the resolution
   switch(range)
