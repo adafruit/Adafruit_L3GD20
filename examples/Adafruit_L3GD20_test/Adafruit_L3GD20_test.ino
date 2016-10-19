@@ -19,7 +19,7 @@
 #include <Adafruit_L3GD20.h>
 
 // Comment this next line to use SPI
-//#define USE_I2C
+#define USE_I2C
 
 #ifdef USE_I2C
   // The default constructor uses I2C
@@ -41,6 +41,9 @@ void setup()
    if (!gyro.begin(gyro.L3DS20_RANGE_250DPS))
   //if (!gyro.begin(gyro.L3DS20_RANGE_500DPS))
   //if (!gyro.begin(gyro.L3DS20_RANGE_2000DPS))
+  // if (!gyro.begin(gyro.L3DS20_RANGE_250DPS, LSM330DL_ADDRESS))
+  //if (!gyro.begin(gyro.L3DS20_RANGE_500DPS, LSM330DL_ADDRESS))
+  //if (!gyro.begin(gyro.L3DS20_RANGE_2000DPS, LSM330DL_ADDRESS))
   {
     Serial.println("Oops ... unable to initialize the L3GD20. Check your wiring!");
     while (1);

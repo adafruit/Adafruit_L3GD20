@@ -24,9 +24,11 @@
 #endif
 #include "Wire.h"
 
+#define LSM330DL_ADDRESS              (0b1101000)   //
 #define L3GD20_ADDRESS                (0x6B)        // 1101011
 #define L3GD20_POLL_TIMEOUT           (100)         // Maximum number of read attempts
 #define L3GD20_ID                     0xD4
+#define LSM330DL_ID                   0xD3
 #define L3GD20H_ID                    0xD7
 
 #define L3GD20_SENSITIVITY_250DPS  (0.00875F)      // Roughly 22/256 for fixed point match

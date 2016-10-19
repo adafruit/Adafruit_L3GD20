@@ -52,7 +52,7 @@ bool Adafruit_L3GD20::begin(l3gd20Range_t rng, byte addr)
      for correct address and that the IC is properly connected */
   uint8_t id = read8(L3GD20_REGISTER_WHO_AM_I);
   //Serial.println(id, HEX);
-  if ((id != L3GD20_ID) && (id != L3GD20H_ID))
+  if ((id != L3GD20_ID) && (id != L3GD20H_ID)&& (id != LSM330DL_ID))
   {
     return false;
   }
